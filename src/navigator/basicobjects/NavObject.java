@@ -7,60 +7,63 @@ package navigator.basicobjects;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.io.Serializable;
 
 /**
  *
  * @author abdel
  */
-public abstract class NavObject {
-    protected String titre;
-    protected String adresse;
+public class NavObject implements Comparable<NavObject>,Serializable,Cloneable{
     
-    /**
-     * position x
-     */
-    protected int x;
-    /**
-     * position y
-     */
-    protected int y;
-    /**
-     * la coleur d'objet
-     */
-    protected Color couleur;
-    /**
-     * taille d'objet
-     */
-    protected int size;
-    /**
-     * visibilite
-     */
-    protected boolean etat;
+    private int type;
+    private String titre;
+    private String adresse;
+    private Image image;
+    private String description;
+    private int x;
+    private int y;
+    private int size;
+    //in the futur SCALE
+    private boolean visibilite;
 
+    
+    public static final String[] types={"Hopital","Ecole","Pharmacie","Etablissement Public","Sation","Parc"};
+    
     public NavObject() {
+        this.type = 0;
         this.titre = "";
         this.adresse = "";
+        this.image = null;
+        this.description = "";
         this.x = 0;
         this.y = 0;
-        this.couleur = Color.GRAY;
-        this.size = 10;
-        this.etat = true;
+        this.size = 30;
+        this.visibilite = true;
     }
 
-    
-    
-    
-    /**
-     *
-     */
-    public NavObject(String titre, String adresse, int x, int y, Color couleur, int size, boolean etat) {    
+    public NavObject(int type, String titre, String adresse, Image image, String description, int x, int y, int size, boolean visibilite) {
+        this.type = type;
         this.titre = titre;
         this.adresse = adresse;
+        this.image = image;
+        this.description = description;
         this.x = x;
         this.y = y;
-        this.couleur = couleur;
         this.size = size;
-        this.etat = etat;
+        this.visibilite = visibilite;
+    }
+
+    public static String[] getTypes() {
+        return types;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getTitre() {
@@ -79,6 +82,22 @@ public abstract class NavObject {
         this.adresse = adresse;
     }
 
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public int getX() {
         return x;
     }
@@ -95,14 +114,6 @@ public abstract class NavObject {
         this.y = y;
     }
 
-    public Color getCouleur() {
-        return couleur;
-    }
-
-    public void setCouleur(Color couleur) {
-        this.couleur = couleur;
-    }
-
     public int getSize() {
         return size;
     }
@@ -111,23 +122,104 @@ public abstract class NavObject {
         this.size = size;
     }
 
-    public boolean isEtat() {
-        return etat;
+    public boolean isVisibilite() {
+        return visibilite;
     }
 
-    public void setEtat(boolean etat) {
-        this.etat = etat;
+    public void setVisibilite(boolean visibilite) {
+        this.visibilite = visibilite;
     }
+
     public boolean apartient(int x, int y){
         return Math.sqrt(Math.pow(this.x-x, 2) + Math.pow(this.y-y, 2))<=(size/2);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ ")
+                .append(types[type]).append("::").append(titre)
+                .append("@").append(adresse)
+                .append(", position:(").append(x).append(", ").append(y).append(")]");
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof NavObject){
+            NavObject o2 =(NavObject)obj;
+            return (this.apartient(o2.x, o2.y) && this.type==o2.type);
+        }else return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + this.type;
+        hash = 23 * hash + this.x;
+        hash = 23 * hash + this.y;
+        return hash;
+    }
     
-    
-    /**
-     * methode qui permet de dissiner l'objet
-     * @param g  objet du context graphique ou on va dissiner l'objet
-     */
-    public abstract void draw(Graphics g);
-    
-    
+    public void draw(Graphics g){
+        int[] xPoints = null;
+        int[] yPoints = null;
+        switch(type){
+            case 0: //"Hopital"
+                g.setColor(Color.RED);
+                xPoints= new int[]{x-(size/6),x+(size/6),x+(size/6),x+(size/2),x+(size/2),x+(size/6),x+(size/6),x-(size/6),x-(size/6),x-(size/2),x-(size/2),x-(size/6)};
+                yPoints= new int[]{y-(size/2),y-(size/2),y-(size/6),y-(size/6),y+(size/6),y+(size/6),y+(size/2),y+(size/2),y+(size/6),y+(size/6),y-(size/6),y-(size/6)};
+                g.fillPolygon(xPoints, yPoints, xPoints.length); 
+                break;
+            case 1: //"Ecole"
+                g.setColor(Color.BLUE);
+                xPoints= new int[]{x           ,x+(size/2),x+(size/3),x+(size/3)  ,x-(size/3)  ,x-(size/3),x-(size/2)};
+                yPoints= new int[]{y-(3*size/5),y-(size/5),y-(size/5),y+(2*size/5),y+(2*size/5),y-(size/5),y-(size/5)};
+                g.fillPolygon(xPoints, yPoints, xPoints.length);
+                g.setColor(Color.RED);
+                g.fillOval(x-(size/12), y, (size/6), (size/5));
+                g.fillRect(x, y, (2*size/6), (size/5));
+                g.setColor(Color.GREEN);
+                g.fillOval(x-(size/12), y+(size/5), (size/6), (size/5));
+                g.fillRect(x, y+(size/5), (2*size/6), (size/5));
+                break;
+            case 2: //"Pharmacie"
+                g.setColor(Color.GREEN);
+                xPoints= new int[]{x-(size/6),x+(size/6),x+(size/6),x+(size/2),x+(size/2),x+(size/6),x+(size/6),x-(size/6),x-(size/6),x-(size/2),x-(size/2),x-(size/6)};
+                yPoints= new int[]{y-(size/2),y-(size/2),y-(size/6),y-(size/6),y+(size/6),y+(size/6),y+(size/2),y+(size/2),y+(size/6),y+(size/6),y-(size/6),y-(size/6)};
+                g.fillPolygon(xPoints, yPoints, xPoints.length); 
+                break;
+            case 3: //"Etablissement Public"
+                g.setColor(Color.GREEN);
+                xPoints= new int[]{x           ,x+(size/2),x+(size/3),x+(size/3)  ,x-(size/3)  ,x-(size/3),x-(size/2)};
+                yPoints= new int[]{y-(3*size/5),y-(size/5),y-(size/5),y+(2*size/5),y+(2*size/5),y-(size/5),y-(size/5)};
+                g.fillPolygon(xPoints, yPoints, xPoints.length);
+                break;
+            case 4: //"Sation"
+                g.setColor(Color.YELLOW);
+                xPoints= new int[]{     x    ,x+(size/2),    x     ,x-(size/2)};
+                yPoints= new int[]{y-(size/2),     y    ,y+(size/2),     y    };
+                g.fillPolygon(xPoints, yPoints, xPoints.length);
+                break;
+            case 5: //"Parc"
+                g.setColor(Color.green);
+                g.fillRect(x-(size/4), y-(size/4), (size/2), (size/2));
+                g.fillOval(x-(size/2), y-(size/4), (size/2), (size/2));
+                g.fillOval(x-(size/4), y-(size/2), (size/2), (size/2));
+                g.fillOval(x, y-(size/4), (size/2), (size/2));
+                g.fillOval(x-(size/4), y, (size/2), (size/2));
+                break;
+            
+        }
+    }
+
+    @Override
+    public int compareTo(NavObject o) {
+        return (this.type>o.type)?-1:1;
+    }
+
+    @Override
+    protected Object clone() {
+        return new NavObject(type, "", "", null, "", x, y, size, visibilite);
+    }    
 }

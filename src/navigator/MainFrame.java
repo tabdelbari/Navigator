@@ -5,36 +5,22 @@
  */
 package navigator;
 
-import java.awt.Image;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import navigator.basicobjects.Airoport;
-import navigator.basicobjects.Ecole;
-import navigator.basicobjects.Hopital;
-import navigator.basicobjects.Marche;
 import navigator.basicobjects.NavObject;
-import navigator.basicobjects.Station;
 
 /**
  *
  * @author abdel
  */
 public class MainFrame extends javax.swing.JFrame {
-    private final String[] typeObjets;
-    private final String[] typesObjets;
-    
     
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
-        
-        typeObjets = new String[]{"Ecole","Hopital","Station","Airoport","Marche","Route"};
-        typesObjets = new String[]{"Ecoles","Hopitals","Stations","Airoports","Marches","Routes"};
         initComponents();
     }
     
@@ -82,8 +68,13 @@ public class MainFrame extends javax.swing.JFrame {
         label_echel.setNextFocusableComponent(text_echel);
 
         text_echel.setText("1");
+        text_echel.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                text_echelPropertyChange(evt);
+            }
+        });
 
-        combobox_type_objet.setModel(new javax.swing.DefaultComboBoxModel<>(typeObjets));
+        combobox_type_objet.setModel(new javax.swing.DefaultComboBoxModel<>(NavObject.types));
         combobox_type_objet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 combobox_type_objetActionPerformed(evt);
@@ -107,23 +98,22 @@ public class MainFrame extends javax.swing.JFrame {
             leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(leftPanelLayout.createSequentialGroup()
                 .addGap(40, 40, 40)
-                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btn_charger_image, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(leftPanelLayout.createSequentialGroup()
-                        .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(label_ajouter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(label_echel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(combobox_type_objet, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(text_echel))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, leftPanelLayout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(text_size, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                        .addComponent(text_size, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(btn_charger_image, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(leftPanelLayout.createSequentialGroup()
+                            .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(label_ajouter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(label_echel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(combobox_type_objet, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(text_echel)))))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
         leftPanelLayout.setVerticalGroup(
             leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -160,7 +150,7 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTable1);
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = typesObjets;
+            String[] strings = NavObject.types;
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -266,50 +256,26 @@ public class MainFrame extends javax.swing.JFrame {
     private void paneauNavigation2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneauNavigation2MouseClicked
         // TODO add your handling code here:
         if(evt.getButton()==MouseEvent.BUTTON1){
-            for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
-                if(next.apartient(evt.getX(),evt.getY()))return;   
-            }
-            String type=typeObjets[combobox_type_objet.getSelectedIndex()];
-            switch(type){
-                case "Ecole":
-                    Ecole e = new Ecole();
-                    e.setX(evt.getX());
-                    e.setY(evt.getY());
-                    e.setSize(Integer.parseInt(text_size.getText()));
-                    paneauNavigation2.getObjetsNavigation().add(e);
+            if(evt.getClickCount()==2){
+                
+                System.out.println("double click");
+                NavObject newObjet=new NavObject(combobox_type_objet.getSelectedIndex(), "", "", null, "", evt.getX(), evt.getY(), 30+Integer.parseInt(text_size.getText()), true);
+                for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
+                    if(next.equals(newObjet))return;   
+                }
+                //TODO: Dialog
 
-                    break;
-                case "Hopital":
-                    Hopital h = new Hopital();
-                    h.setX(evt.getX());
-                    h.setY(evt.getY());
-                    h.setSize(Integer.parseInt(text_size.getText()));
-                    paneauNavigation2.getObjetsNavigation().add(h);
-                    break;
-                case "Station":
-                    Station s = new Station();
-                    s.setX(evt.getX());
-                    s.setY(evt.getY());
-                    s.setSize(Integer.parseInt(text_size.getText()));
-                    paneauNavigation2.getObjetsNavigation().add(s);
-                    break;
-                case "Airoport":
-                    Airoport a = new Airoport();
-                    a.setX(evt.getX());
-                    a.setY(evt.getY());
-                    a.setSize(Integer.parseInt(text_size.getText()));
-                    paneauNavigation2.getObjetsNavigation().add(a);
-                    break;
-                case "Marche":
-                    Marche m = new Marche();
-                    m.setX(evt.getX());
-                    m.setY(evt.getY());
-                    m.setSize(Integer.parseInt(text_size.getText()));
-                    paneauNavigation2.getObjetsNavigation().add(m);
-                    break;
-            }
+                paneauNavigation2.getObjetsNavigation().add(newObjet);
+                
+            }else if(evt.getClickCount()==1){ 
+                for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
+                    if(next.apartient(evt.getX(),evt.getY()))selectionne=next;  
+                }
+                //TODO: affichage des informations sur l'objet
+                
+                selectionne=null;
+            } 
         }else if(evt.getButton()==MouseEvent.BUTTON3){
-            System.out.println("supprimer");
             for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
                 if(next.apartient(evt.getX(),evt.getY()))selectionne=next;  
             }
@@ -328,20 +294,24 @@ public class MainFrame extends javax.swing.JFrame {
     private NavObject selectionne =null;
     private void paneauNavigation2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneauNavigation2MousePressed
         // TODO add your handling code here:
-        for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
-            if(next.apartient(evt.getX(),evt.getY()))selectionne=next;
+        if(evt.getButton()==MouseEvent.BUTTON1){
+            for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
+                if(next.apartient(evt.getX(),evt.getY()))selectionne=next;
+            }
         }
     }//GEN-LAST:event_paneauNavigation2MousePressed
 
     private void paneauNavigation2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneauNavigation2MouseReleased
         // TODO add your handling code here:
-        selectionne =null;
+        if(evt.getButton()==MouseEvent.BUTTON1){
+            selectionne =null;
+        }
     }//GEN-LAST:event_paneauNavigation2MouseReleased
 
     private void paneauNavigation2MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneauNavigation2MouseDragged
         // TODO add your handling code here:
-        String type=typeObjets[combobox_type_objet.getSelectedIndex()];
-        if(type.equals("Route")){
+        int type=combobox_type_objet.getSelectedIndex();
+        if(type<0 || type>NavObject.types.length-1){
             
         }else{
             if(selectionne!=null){
@@ -355,12 +325,18 @@ public class MainFrame extends javax.swing.JFrame {
     private void btn_charger_imageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_charger_imageMouseClicked
         // TODO add your handling code here:
         JFileChooser file_chooser = new JFileChooser();
-        file_chooser.setFileFilter(new FileNameExtensionFilter("Images", new String[]{"*.jpg","*.png","*.gif","*.jpeg"}));
+        file_chooser.setFileFilter(new FileNameExtensionFilter("Images", new String[]{"jpg","png","gif","jpeg"}));
         file_chooser.showDialog(this, "Charger");
         System.out.println(file_chooser.getSelectedFile().getAbsolutePath());
         if(file_chooser.getSelectedFile().exists()){ImageIcon icon = new ImageIcon(file_chooser.getSelectedFile().getAbsolutePath()); paneauNavigation2.setImage(icon.getImage()); jScrollPane1.repaint();}
         
     }//GEN-LAST:event_btn_charger_imageMouseClicked
+
+    private void text_echelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_text_echelPropertyChange
+        // TODO add your handling code here:
+        int v=Integer.parseInt(text_echel.getText());
+        paneauNavigation2.setScale(v);
+    }//GEN-LAST:event_text_echelPropertyChange
 
     /**
      * @param args the command line arguments
@@ -388,6 +364,7 @@ public class MainFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new MainFrame().setVisible(true);
+            //i propose to ...
       
         });
     }
