@@ -10,6 +10,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Collections;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import navigator.basicobjects.NavObject;
 
@@ -19,6 +21,7 @@ import navigator.basicobjects.NavObject;
  */
 public class PaneauNavigation extends JPanel{
     private ArrayList<NavObject> objetsNavigation;
+    private JList types_visibles;
     Image image=null;
     int scale;
 
@@ -34,8 +37,9 @@ public class PaneauNavigation extends JPanel{
     
     
     
-    public PaneauNavigation() {
+    public PaneauNavigation(JList types_visibles) {
         super();
+        this.types_visibles=types_visibles;
         objetsNavigation = new ArrayList<>();
         scale=1;
         setPreferredSize(new Dimension(600, 600));
@@ -54,7 +58,11 @@ public class PaneauNavigation extends JPanel{
         g2d.scale(scale, scale);
         g2d.drawImage(image, 0, 0,null);
         objetsNavigation.forEach((next) -> {
-            if(next.isVisibilite())next.draw(g2d);
+            boolean v=false;
+            for (int typeV : types_visibles.getSelectedIndices()) {
+                if(next.getType()==typeV){v=true;break;}
+            }
+            if(next.isVisibilite() && v)next.draw(g2d);
         });
     }
     

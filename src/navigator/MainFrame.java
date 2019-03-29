@@ -22,6 +22,11 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        int[] types_visibles=new int[NavObject.types.length];
+        for (int i=0; i< NavObject.types.length;i++) {
+            types_visibles[i]=i;
+        }
+        liste_types_visibles.setSelectedIndices(types_visibles);
     }
     
     /**
@@ -46,11 +51,11 @@ public class MainFrame extends javax.swing.JFrame {
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table_objets = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        liste_types_visibles = new javax.swing.JList<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        paneauNavigation2 = new navigator.PaneauNavigation();
+        paneauNavigation2 = new navigator.PaneauNavigation(liste_types_visibles);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -132,7 +137,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(text_size, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addContainerGap(373, Short.MAX_VALUE))
+                .addContainerGap(375, Short.MAX_VALUE))
         );
 
         jSplitPane1.setLeftComponent(leftPanel);
@@ -140,28 +145,27 @@ public class MainFrame extends javax.swing.JFrame {
         jSplitPane2.setDividerLocation(600);
         jSplitPane2.setResizeWeight(1.0);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-            },
-            new String [] {
-                "Nom", "Type", "Visible"
-            }
-        ));
-        jScrollPane2.setViewportView(jTable1);
+        table_objets.setModel(new ObjetsTableModel(paneauNavigation2));
+        jScrollPane2.setViewportView(table_objets);
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        liste_types_visibles.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = NavObject.types;
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane3.setViewportView(jList1);
+        liste_types_visibles.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                liste_types_visiblesValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(liste_types_visibles);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -200,7 +204,7 @@ public class MainFrame extends javax.swing.JFrame {
         paneauNavigation2.setLayout(paneauNavigation2Layout);
         paneauNavigation2Layout.setHorizontalGroup(
             paneauNavigation2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 624, Short.MAX_VALUE)
+            .addGap(0, 600, Short.MAX_VALUE)
         );
         paneauNavigation2Layout.setVerticalGroup(
             paneauNavigation2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,6 +270,7 @@ public class MainFrame extends javax.swing.JFrame {
                 //TODO: Dialog
 
                 paneauNavigation2.getObjetsNavigation().add(newObjet);
+                ((ObjetsTableModel)table_objets.getModel()).fireTableDataChanged();
                 
             }else if(evt.getClickCount()==1){ 
                 for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
@@ -338,6 +343,18 @@ public class MainFrame extends javax.swing.JFrame {
         paneauNavigation2.setScale(v);
     }//GEN-LAST:event_text_echelPropertyChange
 
+    private void liste_types_visiblesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_liste_types_visiblesValueChanged
+        // TODO add your handling code here:
+        paneauNavigation2.getObjetsNavigation().forEach((next) -> {
+            next.setVisibilite(false);
+            for (int typeV : liste_types_visibles.getSelectedIndices()) {
+                if(next.getType()==typeV){next.setVisibilite(true);break;}
+            }
+        });
+        ((ObjetsTableModel)table_objets.getModel()).fireTableDataChanged();
+        paneauNavigation2.repaint();
+    }//GEN-LAST:event_liste_types_visiblesValueChanged
+
     /**
      * @param args the command line arguments
      */
@@ -373,19 +390,19 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton btn_charger_image;
     private javax.swing.JComboBox<String> combobox_type_objet;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel label_ajouter;
     private javax.swing.JLabel label_echel;
     private javax.swing.JPanel leftPanel;
+    private javax.swing.JList<String> liste_types_visibles;
     private navigator.PaneauNavigation paneauNavigation2;
     private javax.swing.JPanel rightPanel;
+    private javax.swing.JTable table_objets;
     private javax.swing.JTextField text_echel;
     private javax.swing.JTextField text_size;
     // End of variables declaration//GEN-END:variables
