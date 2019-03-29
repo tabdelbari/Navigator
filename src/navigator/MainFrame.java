@@ -7,6 +7,7 @@ package navigator;
 
 import java.awt.event.MouseEvent;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import navigator.basicobjects.NavObject;
@@ -26,7 +27,7 @@ public class MainFrame extends javax.swing.JFrame {
         for (int i=0; i< NavObject.types.length;i++) {
             types_visibles[i]=i;
         }
-        //liste_types_visibles.setSelectedIndices(types_visibles);
+        liste_types_visibles.setSelectedIndices(types_visibles);
     }
     
     /**
@@ -268,10 +269,17 @@ public class MainFrame extends javax.swing.JFrame {
                     if(next.equals(newObjet))return;   
                 }
                 //TODO: Dialog
-
-                paneauNavigation2.getObjetsNavigation().add(newObjet);
-                ((ObjetsTableModel)table_objets.getModel()).fireTableDataChanged();
-                
+                NouveauDialog nd =new NouveauDialog(this, true);
+                nd.setTitle("Nouveau: "+NavObject.types[combobox_type_objet.getSelectedIndex()]);
+                nd.setVisible(true);
+                if(nd.isValide()){
+                    newObjet.setTitre(nd.getTitre());
+                    newObjet.setAdresse(nd.getAdresse());
+                    newObjet.setImage(nd.getImage());
+                    newObjet.setDescription(nd.getDescription());
+                    paneauNavigation2.getObjetsNavigation().add(newObjet);
+                    ((ObjetsTableModel)table_objets.getModel()).fireTableDataChanged();
+                }  
             }else if(evt.getClickCount()==1){ 
                 for (NavObject next : paneauNavigation2.getObjetsNavigation()) {
                     if(next.apartient(evt.getX(),evt.getY()))selectionne=next;  
@@ -332,7 +340,8 @@ public class MainFrame extends javax.swing.JFrame {
         JFileChooser file_chooser = new JFileChooser();
         file_chooser.setFileFilter(new FileNameExtensionFilter("Images", new String[]{"jpg","png","gif","jpeg"}));
         file_chooser.showDialog(this, "Charger");
-        System.out.println(file_chooser.getSelectedFile().getAbsolutePath());
+        ///////modifier verification
+        
         if(file_chooser.getSelectedFile().exists()){ImageIcon icon = new ImageIcon(file_chooser.getSelectedFile().getAbsolutePath()); paneauNavigation2.setImage(icon.getImage()); jScrollPane1.repaint();}
         
     }//GEN-LAST:event_btn_charger_imageMouseClicked
@@ -365,12 +374,14 @@ public class MainFrame extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
+            
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
