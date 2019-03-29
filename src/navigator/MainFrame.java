@@ -26,7 +26,7 @@ public class MainFrame extends javax.swing.JFrame {
         for (int i=0; i< NavObject.types.length;i++) {
             types_visibles[i]=i;
         }
-        liste_types_visibles.setSelectedIndices(types_visibles);
+        //liste_types_visibles.setSelectedIndices(types_visibles);
     }
     
     /**
